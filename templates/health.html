@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Assessment</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Health Assessment Form</h2>
+        <form id="healthForm">
+            <div class="form-group">
+                <label for="height_cm">Height (cm)</label>
+                <input type="number" class="form-control" id="height_cm" required>
+            </div>
+            <div class="form-group">
+                <label for="weight_kg">Weight (kg)</label>
+                <input type="number" class="form-control" id="weight_kg" required>
+            </div>
+            <div class="form-group">
+                <label for="blood_pressure">Blood Pressure</label>
+                <input type="text" class="form-control" id="blood_pressure">
+            </div>
+            <div class="form-group">
+                <label for="heart_rate">Heart Rate</label>
+                <input type="number" class="form-control" id="heart_rate">
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea class="form-control" id="notes"></textarea>
+            </div>
+            <button type="button" id="submitBtn" class="btn btn-primary" onclick="submitHealthAssessment()">Submit
+                Assessment</button>
+        </form>
+        <p id="responseMessage" class="mt-3"></p>
+    </div>
+    <script>
+        async function submitHealthAssessment() {
+            // Capture form data
+            const data = {
+                height_cm: document.getElementById('height_cm').value,
+                weight_kg: document.getElementById('weight_kg').value,
+                blood_pressure: document.getElementById('blood_pressure').value,
+                heart_rate: document.getElementById('heart_rate').value,
+                notes: document.getElementById('notes').value
+            };
+            try {
+                // Send data to the backend
+                const response = await fetch('/health_assessment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                // Display response message
+                const result = await response.json();
+                document.getElementById('responseMessage').textContent = result.message;
+                // Disable form on successful submission
+                if (response.ok) {
+                    document.getElementById('submitBtn').disabled = true;
+                    document.getElementById('responseMessage').textContent = "Health assessment submitted successfully. You cannot submit again.";
+                    window.location.href = "/health_excer";
+                }
+            } catch (error) {
+                console.error("Error submitting health assessment:", error);
+                document.getElementById('responseMessage').textContent = "Failed to submit health assessment";
+            }
+        }
+    </script>
+</body>
+</html>

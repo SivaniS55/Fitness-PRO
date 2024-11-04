@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disability Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" defer></script>
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    <div class="container mt-5">
+        <div class="card p-4 mb-5">
+            <h2>Add Meal Entry</h2>
+            <form id="addMealForm">
+                <!-- Day -->
+                <div class="mb-3">
+                    <label for="day" class="form-label">Day</label>
+                    <select class="form-control" id="day" name="day" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                </div>
+                <!-- Meal Name -->
+                <div class="mb-3">
+                    <label for="mealName" class="form-label">Meal Name</label>
+                    <input type="text" class="form-control" id="mealName" name="meal_name" required>
+                </div>
+                <!-- Weight -->
+                <div class="mb-3">
+                    <label for="weight" class="form-label">Weight</label>
+                    <input type="number" class="form-control" id="weight" name="weight" required>
+                </div>
+                <!-- Time of Day -->
+                <div class="mb-3">
+                    <label for="timeOfDay" class="form-label">Time of Day</label>
+                    <select class="form-control" id="timeOfDay" name="time_of_day" required>
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                        <option value="Evening">Evening</option>
+                        <option value="Night">Night</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="addMeal()">Add Meal</button>
+            </form>
+        </div>
+        <div class="container">
+            <table class="table table-striped" id="mealsTable">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Meal Name</th>
+                        <th>Weight</th>
+                        <th>Time of Day</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be added dynamically -->
+                </tbody>
+            </table>
+            <!-- Update Modal -->
+            <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="updateModalLabel">Update Meal Entry</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="updateMealForm">
+                                <input type="hidden" id="updateMealId">
+                                <div class="mb-3">
+                                    <label for="updateMealName" class="form-label">Meal Name</label>
+                                    <input type="text" class="form-control" id="updateMealName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateDay" class="form-label">Day</label>
+                                    <select class="form-control" id="updateDay" name="updateday" required>
+                                        <option value="Monday">Monday</option>
+                                        <option value="Tuesday">Tuesday</option>
+                                        <option value="Wednesday">Wednesday</option>
+                                        <option value="Thursday">Thursday</option>
+                                        <option value="Friday">Friday</option>
+                                        <option value="Saturday">Saturday</option>
+                                        <option value="Sunday">Sunday</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateWeight" class="form-label">Weight</label>
+                                    <input type="number" class="form-control" id="updateWeight" required>
+                                </div>
+                                <!-- Update Time of Day -->
+                                <div class="mb-3">
+                                    <label for="updateTimeOfDay" class="form-label">Time of Day</label>
+                                    <select class="form-control" id="updateTimeOfDay" name="update_time_of_day"
+                                        required>
+                                        <option value="Morning">Morning</option>
+                                        <option value="Afternoon">Afternoon</option>
+                                        <option value="Evening">Evening</option>
+                                        <option value="Night">Night</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="updateMeal()">Save
+                                    changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let meals = []; // Define the meals array
+        // Add Meal function
+        async function addMeal() {
+            const day = document.getElementById('day').value;
+            const meal_name = document.getElementById('mealName').value;
+            const weight = document.getElementById('weight').value;
+            const time_of_day = document.getElementById('timeOfDay').value; // New time_of_day value
+            const response = await fetch('/meal/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ day, meal_name, weight, time_of_day }) // Include time_of_day
+            });
+            if (response.ok) {
+                alert('Meal added successfully');
+                fetchMeals();  // Refresh the table
+            } else {
+                alert('Failed to add meal');
+            }
+        }
+        // Fetch and display meals
+        async function fetchMeals() {
+            const response = await fetch('/mealspec');
+            meals = await response.json();
+            const tbody = document.getElementById('mealsTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            meals.forEach(meal => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${meal.day}</td>
+                    <td>${meal.meal_name}</td>
+                    <td>${meal.weight}</td>
+                    <td>${meal.time_of_day}</td> <!-- New time_of_day column -->
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMeal('${meal.meal_id}')">Delete</button>
+                    </td>
+                `;
+            });
+        }
+        // Show modal with meal details for updating
+        function showUpdateModal(mealId) {
+            const meal = meals.find(m => m.meal_id === mealId);
+            if (meal) {
+                document.getElementById('updateMealId').value = meal.meal_id;
+                document.getElementById('updateMealName').value = meal.meal_name;
+                document.getElementById('updateDay').value = meal.day;
+                document.getElementById('updateWeight').value = meal.weight;
+                document.getElementById('updateTimeOfDay').value = meal.time_of_day; // Populate time_of_day for update
+                new bootstrap.Modal(document.getElementById('updateModal')).show();
+            }
+        }
+        // Update Meal function
+        async function updateMeal() {
+            const meal_id = document.getElementById('updateMealId').value;
+            const meal_name = document.getElementById('updateMealName').value;
+            const day = document.getElementById('updateDay').value;
+            const weight = document.getElementById('updateWeight').value;
+            const time_of_day = document.getElementById('updateTimeOfDay').value; // New time_of_day value
+            const response = await fetch(`/meal/update/${meal_id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ meal_name, day, weight, time_of_day }) // Include time_of_day
+            });
+            if (response.ok) {
+                alert('Meal updated successfully');
+                fetchMeals();  // Refresh the table
+            } else {
+                alert('Failed to update meal');
+            }
+        }
+        // Delete Meal function
+        async function deleteMeal(meal_id) {
+            const response = await fetch(`/meal/delete/${meal_id}`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                alert('Meal deleted successfully');
+                fetchMeals();  // Refresh the table
+            } else {
+                alert('Failed to delete meal');
+            }
+        }
+        // Initialize on page load
+        fetchMeals();
+    </script>
+</body>
+
+</html>

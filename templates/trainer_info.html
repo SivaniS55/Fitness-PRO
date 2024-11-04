@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Information and Exercises</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% include 'nav.html' %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Trainer Information and Exercises</h1>
+        <!-- Trainer Information Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Trainer Information
+            </div>
+            <div class="card-body">
+                {% if trainer_info %}
+                <h5>{{ trainer_info[1]}} {{ trainer_info[2] }}</h5>
+                <p><strong>Phone:</strong> {{ trainer_info[3]}}</p>
+                <p><strong>Email:</strong> {{ trainer_info[4] }}</p>
+                <p><strong>Age:</strong> {{ trainer_info[5] }}</p>
+                <p><strong>Gender:</strong> {{ trainer_info[6] }}</p>
+                <p><strong>Date of Birth:</strong> {{ trainer_info[7] }}</p>
+                <p><strong>About Trainer:</strong> {{ trainer_info[8] }}</p>
+                {% else %}
+                <p>No trainer information available.</p>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Disability Selection and Exercises Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                Select Disability to View Exercises
+            </div>
+            <div class="card-body">
+                <!-- Disability Dropdown -->
+                <div class="mb-3">
+                    <label for="disabilitySelect" class="form-label">Disability</label>
+                    <select id="disabilitySelect" class="form-control" onchange="fetchExercises()">
+                        <option value="">-- Select a Disability --</option>
+                        {% for disability in disabilities %}
+                        <option value="{{ disability[0] }}">{{ disability[2] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Exercises Section -->
+                <div id="exercisesContainer" class="row mt-4">
+                    <!-- Exercise cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        // Function to fetch exercises for the selected disability
+        async function fetchExercises() {
+            const ds_id = document.getElementById('disabilitySelect').value;
+            const exercisesContainer = document.getElementById('exercisesContainer');
+            // Clear the current exercises
+            exercisesContainer.innerHTML = '';
+            // Fetch exercises if a disability is selected
+            if (ds_id) {
+                const response = await fetch(`/fetch-exercises?ds_id=${ds_id}`);
+                const exercises = await response.json();
+                // Populate exercisesContainer with fetched exercises
+                exercises.forEach(exercise => {
+                    const exerciseCard = document.createElement('div');
+                    exerciseCard.className = 'col-md-4 mb-4';
+                    exerciseCard.innerHTML = `
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">${exercise.exercise_name}</h5>
+                                <p class="card-text">${exercise.description}</p>
+                                <p><strong>Day:</strong> ${exercise.day}</p>
+                            </div>
+                        </div>
+                    `;
+                    exercisesContainer.appendChild(exerciseCard);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

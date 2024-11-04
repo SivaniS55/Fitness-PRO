@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disability Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" defer></script>
+    <!-- Ensure this line is present -->
+</head>
+<body>
+    {% include 'nav.html' %}
+    <div class="container">
+        <h2>Disabilities List <span style="font-size: 15px;"> <a href="/disability" style="text-decoration: none;"> (
+                    Manage Disabilty )</a> </span> </h2>
+        <table class="table table-striped" id="disabilitiesTable">
+            <thead>
+                <tr>
+                    <th>Disability Name</th>
+                    <th>Description</th>
+                    <th>Days Suffering</th>
+                    <th>Severity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Disability rows will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function fetchDisabilities() {
+            try {
+                const response = await fetch('/disabilities');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch disabilities');
+                }
+                const data = await response.json();
+                const tbody = document.getElementById('disabilitiesTable').getElementsByTagName('tbody')[0];
+                tbody.innerHTML = ''; // Clear existing rows
+                data.forEach(disability => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${disability.name}</td>
+                        <td>${disability.description}</td>
+                        <td>${disability.days_suffering}</td>
+                        <td>${disability.severity}</td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error fetching disabilities:", error);
+            }
+        }
+        fetchDisabilities();
+    </script>
+</body>
+</html>

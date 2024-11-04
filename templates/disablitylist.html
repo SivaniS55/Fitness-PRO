@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disability Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Ensure this line is present -->
+</head>
+<body>
+    {% include 'nav.html' %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Manage Disabilities</h1>
+        
+        <div class="card p-4 mb-5">
+            <h2>Add Disability</h2>
+            <form id="addDisabilityForm">
+                <div class="mb-3">
+                    <label for="disabilityName" class="form-label">Disability Name</label>
+                    <input type="text" class="form-control" id="disabilityName" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="description" name="description" required>
+                </div>
+                <div class="mb-3">
+                    <label for="daysSuffering" class="form-label">Days Suffering</label>
+                    <input type="date" class="form-control" id="daysSuffering" name="days_suffering" required>
+                </div>
+                <div class="mb-3">
+                    <label for="customRange3" class="form-label">Severity (0-5)
+                        <h4 id="rangeValue">0</h4>
+                    </label>
+                    <input type="range" class="form-range" min="0" max="5" step="0.5" id="severity" name="severity" required oninput="updateRangeValue(this.value)">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="addDisability()">Add Disability</button>
+            </form>
+        </div>
+        
+        <h2>Disabilities List</h2>
+        <table class="table table-striped" id="disabilitiesTable">
+            <thead>
+                <tr>
+                    <th>Disability Name</th>
+                    <th>Description</th>
+                    <th>Suffering From</th>
+                    <th>Severity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="modal fade" id="editDisabilityModal" tabindex="-1" aria-labelledby="editDisabilityModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDisabilityModalLabel">Edit Disability</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDisabilityForm">
+                        <input type="hidden" id="editDisabilityId">
+                        <div class="mb-3">
+                            <label for="editDisabilityName" class="form-label">Disability Name</label>
+                            <input type="text" class="form-control" id="editDisabilityName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDescription" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="editDescription" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDaysSuffering" class="form-label">Days Suffering</label>
+                            <input type="number" class="form-control" id="editDaysSuffering" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSeverity" class="form-label">Severity</label>
+                            <input type="text" class="form-control" id="editSeverity" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="submitUpdateDisability()">Update Disability</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function fetchDisabilities() {
+            try {
+                const response = await fetch('/disabilities');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch disabilities');
+                }
+                const data = await response.json();
+                const tbody = document.getElementById('disabilitiesTable').getElementsByTagName('tbody')[0];
+                tbody.innerHTML = ''; // Clear existing rows
+                data.forEach(disability => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${disability.name}</td>
+                        <td>${disability.description}</td>
+                        <td>${disability.days_suffering}</td>
+                        <td>${disability.severity}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="openEditModal('${disability.id}', '${disability.name}', '${disability.description}', ${disability.days_suffering}, '${disability.severity}')">Update</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteDisability('${disability.id}')">Delete</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error fetching disabilities:", error);
+            }
+        }
+        async function addDisability() {
+            const name = document.getElementById('disabilityName').value;
+            const description = document.getElementById('description').value;
+            const days_suffering = document.getElementById('daysSuffering').value;
+            const severity = document.getElementById('severity').value;
+            try {
+                const response = await fetch('/disability/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description, days_suffering, severity })
+                });
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    throw new Error(errorResponse.error || 'Failed to add disability');
+                }
+                fetchDisabilities(); 
+                alert("Diability Added")
+            } catch (error) {
+                console.error("Error adding disability:", error);
+                alert('Failed to add disability: ' + error.message);
+            }
+        }
+        async function deleteDisability(disabilityId) {
+    try {
+        const response = await fetch(`/disability/delete/${disabilityId}`, {
+            method: 'DELETE',
+        });
+        const contentType = response.headers.get("content-type");
+        if (!response.ok) {
+            const errorMessage = contentType && contentType.includes("application/json")
+                ? await response.json()
+                : await response.text();
+            throw new Error(`Error: ${errorMessage}`);
+        }
+        const data = await response.json();
+        alert("Diability Deleted")
+        fetchDisabilities();
+    } catch (error) {
+        console.error("Error deleting disability:", error);
+    }
+}
+function openEditModal(id, name, description, daysSuffering, severity) {
+            document.getElementById('editDisabilityId').value = id;
+            document.getElementById('editDisabilityName').value = name;
+            document.getElementById('editDescription').value = description;
+            document.getElementById('editDaysSuffering').value = daysSuffering;
+            document.getElementById('editSeverity').value = severity;
+            const editModal = new bootstrap.Modal(document.getElementById('editDisabilityModal'));
+            editModal.show();
+        }
+        async function submitUpdateDisability() {
+            const id = document.getElementById('editDisabilityId').value;
+            const ds_name = document.getElementById('editDisabilityName').value;
+            const description = document.getElementById('editDescription').value;
+            const days_suffering = document.getElementById('editDaysSuffering').value;
+            const severity = document.getElementById('editSeverity').value;
+            const updatedData = { ds_name, description, days_suffering, severity };
+            try {
+                const response = await fetch(`/disability/update/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedData),
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(data.message); // Show success message
+                    fetchDisabilities(); // Refresh the table after the update
+                    // Hide the modal after updating
+                    const editModal = bootstrap.Modal.getInstance(document.getElementById('editDisabilityModal'));
+                    editModal.hide();
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.error); // Show error message
+                }
+            } catch (error) {
+                console.error('Error updating disability:', error);
+                alert('An error occurred while updating the disability.');
+            }
+        }
+        // Initial fetch to populate the table
+        fetchDisabilities();
+    </script>
+<script>
+    function updateRangeValue(value) {
+        document.getElementById('rangeValue').textContent = value;
+    }
+</script>
+</body>
+</html>

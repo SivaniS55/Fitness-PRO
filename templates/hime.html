@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hire a Trainer</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    <div class="container" style="margin-top: 5%;">
+        <h1 class="mt-5">Hire a Trainer</h1>
+        <div id="trainer-cards" class="row">
+            <!-- Trainer cards will be dynamically generated here -->
+        </div>
+        <div id="plan-section" class="d-none">
+            <h2>Select a Plan</h2>
+            <div id="plan-cards" class="row">
+                <!-- Plan cards will be displayed here -->
+            </div>
+            <button id="next-button" class="btn btn-primary mt-3">Next</button>
+        </div>
+        <div id="payment-section" class="d-none">
+            <h2>Payment Details</h2>
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" class="form-control" id="cardNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="ccv">CCV</label>
+                    <input type="text" class="form-control" id="ccv" required>
+                </div>
+                <div class="form-group">
+                    <label for="nameOnCard">Name on Card</label>
+                    <input type="text" class="form-control" id="nameOnCard" required>
+                </div>
+                <div class="form-group">
+                    <label for="expiryDate">Expiry Date</label>
+                    <input type="month" class="form-control" id="expiryDate" required>
+                </div>
+                <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const plans = [
+            { name: "Gold", price: "$100" },
+            { name: "Silver", price: "$70" },
+            { name: "Platinum", price: "$150" }
+        ];
+        const trainerCardsContainer = document.getElementById('trainer-cards');
+        const planCardsContainer = document.getElementById('plan-cards');
+        const nextButton = document.getElementById('next-button');
+        const paymentSection = document.getElementById('payment-section');
+        let selectedTrainerId;
+        // Function to generate trainer cards
+        async function generateTrainerCards() {
+            try {
+                const response = await fetch('/trainall'); // Fetch trainer details from the endpoint
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                console.log("Trainer data:", data); // Log the data to see the structure
+                data.forEach(trainer => {
+                    const card = document.createElement('div');
+                    card.className = 'col-md-4';
+                    card.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${trainer.first_name}</h5>
+                            <p class="card-text">${trainer.trainer_info}</p>
+                            <button class="btn btn-primary select-trainer" data-id="${trainer.userid}">Select Trainer</button>
+                        </div>
+                    </div>
+                `;
+                    trainerCardsContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Error fetching trainers:", error);
+            }
+        }
+        // Function to generate plan cards
+        function generatePlanCards() {
+            plans.forEach(plan => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4';
+                card.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${plan.name}</h5>
+                        <p class="card-text">${plan.price}</p>
+                    </div>
+                </div>
+            `;
+                planCardsContainer.appendChild(card);
+            });
+        }
+        // Event listener for selecting a trainer
+        trainerCardsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('select-trainer')) {
+                selectedTrainerId = e.target.getAttribute('data-id');
+                document.getElementById('plan-section').classList.remove('d-none');
+                trainerCardsContainer.classList.add('d-none');
+                generatePlanCards();
+            }
+        });
+        // Event listener for next button to show payment section
+        nextButton.addEventListener('click', () => {
+            paymentSection.classList.remove('d-none');
+            document.getElementById('plan-section').classList.add('d-none');
+        });
+        // Handle payment form submission
+        document.getElementById('payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log(selectedTrainerId)
+            try {
+                const response = await fetch('/addtraineruser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ trainer_id: selectedTrainerId })
+                });
+                if (response.ok) {
+                    alert('Payment submitted successfully!');
+                    window.location.href = '/home';
+                } else {
+                    alert('Failed to submit payment.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+            // Reset the form and update the UI
+            document.getElementById('payment-form').reset();
+            paymentSection.classList.add('d-none');
+            trainerCardsContainer.classList.remove('d-none');
+            trainerCardsContainer.innerHTML = '';
+            generateTrainerCards();
+        });
+        // Initial call to generate trainer cards
+        generateTrainerCards();
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
