@@ -1,1 +1,4 @@
 flask
+python-dotenv
+gunicorn
+# Add any database libraries you're using (e.g., pymysql, psycopg2-binary)
