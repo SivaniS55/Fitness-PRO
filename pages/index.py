@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Add a simple test route directly here
-@app.route('/')
+@app.route('/user.html')
 def index():
     return 'Flask app is running!'
 
