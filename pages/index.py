@@ -20,10 +20,9 @@ def not_found_error(error):
 def internal_error(error):
     return {"error": "Internal server error"}, 500
 
-# Application entry point
-if __name__ == '_main_':
+if __name__ == '__main__':  # Corrected condition for main entry
     try:
-        app.run()
+        app.run(host='0.0.0.0', port=5000)  # Added host and port for production
     except Exception as e:
         logger.error(f"Application failed to start: {e}")
         sys.exit(1)
