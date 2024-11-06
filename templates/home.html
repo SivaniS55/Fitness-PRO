@@ -8,7 +8,7 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-  {% if pagetype && pagetype[:3] == 'USR' %}
+  {% if pagetype[:3] == 'USR' %}
   {% include 'nav.html' %}
   {% include 'user.html' %}
   {% else %}
