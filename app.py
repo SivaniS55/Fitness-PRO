@@ -53,8 +53,11 @@ from dbconfig.userend import (
     trainer_info,
 )
 
+
 app = Flask(__name__)
 app.config.from_object(Config)
+
+
 
 
 def create_userid(first_name, last_name, email, is_trainer=False):

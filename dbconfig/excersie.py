@@ -78,13 +78,13 @@ def get_exer():
     a.description,
     a.day
 FROM 
-    gym_train.warm_up_exercises a
+    fitness_pro.warm_up_exercises a
 LEFT JOIN 
-    gym_train.trainer_details b ON a.trainer_id = b.userid
+    fitness_pro.trainer_details b ON a.trainer_id = b.userid
 LEFT JOIN 
-    gym_train.disability d ON a.ds_id = d.ds_id
+    fitness_pro.disability d ON a.ds_id = d.ds_id
 LEFT JOIN 
-    gym_train.user_details c ON a.trainer_id = c.userid;
+    fitness_pro.user_details c ON a.trainer_id = c.userid;
 """
     )
     get_exer = cursor.fetchall()
@@ -119,13 +119,13 @@ SELECT
     a.day,
     COALESCE(c.userid, b.userid) AS userid
 FROM 
-    gym_train.warm_up_exercises a
+    fitness_pro.warm_up_exercises a
 LEFT JOIN 
-    gym_train.trainer_details b ON a.trainer_id = b.userid
+    fitness_pro.trainer_details b ON a.trainer_id = b.userid
 LEFT JOIN 
-    gym_train.disability d ON a.ds_id = d.ds_id
+    fitness_pro.disability d ON a.ds_id = d.ds_id
 LEFT JOIN 
-    gym_train.user_details c ON a.trainer_id = c.userid)
+    fitness_pro.user_details c ON a.trainer_id = c.userid)
     select * from cte1 where userid ='{userid}'
 """
     )
@@ -152,11 +152,11 @@ def get_exer_spec_user(userid):
     cursor = conn.cursor()
     cursor.execute(
         f"""with cte1 as (
-select userid, first_name, last_name, phone_number, email, age, gender, dob, password, trainer_info from gym_train.trainer_details
+select userid, first_name, last_name, phone_number, email, age, gender, dob, password, trainer_info from fitness_pro.trainer_details
 ),cte2 as (
-select userid, first_name, last_name, phone_number, email, age, gender, dob, password from gym_train.user_details ud 
+select userid, first_name, last_name, phone_number, email, age, gender, dob, password from fitness_pro.user_details ud 
 ),cte3 as (
-select userid, trainer_id from gym_train.subscription
+select userid, trainer_id from fitness_pro.subscription
 )
 select 
 *

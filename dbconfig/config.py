@@ -1,8 +1,9 @@
 import os
 
 class Config:
-    SECRET_KEY = '4&^%&^$^%$&^(&*^*vjhFHJgfU^$%^%$*&^uGJHFHjgE#$&^%$^&*%*(%&^%))'
-    MYSQL_HOST = 'localhost'
-    MYSQL_USER = 'root'
-    MYSQL_PASSWORD = 'root1234'
-    MYSQL_DB = 'gym_train'
+    SECRET_KEY = os.getenv("SECRET_KEY", "Fitness-pro1")
+    MYSQL_HOST = "fitness-pro.cdga22ekaxjl.us-east-2.rds.amazonaws.com"
+    MYSQL_PORT = 3306
+    MYSQL_USER = "admin"
+    MYSQL_PASSWORD = "Fitness-pro1"
+    MYSQL_DB = "fitness_pro"

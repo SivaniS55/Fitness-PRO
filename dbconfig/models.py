@@ -88,10 +88,10 @@ def validate_user(e_mail, password):
     cursor = conn.cursor()
     cursor.execute(
         f"""WITH cte1 AS (
-    SELECT userid, first_name, last_name, phone_number, email, age, gender, dob, password,"I'm User" AS trainer_info FROM gym_train.user_details
+    SELECT userid, first_name, last_name, phone_number, email, age, gender, dob, password,"I'm User" AS trainer_info FROM fitness_pro.user_details
 ),
 cte2 AS (
-    SELECT * FROM gym_train.trainer_details
+    SELECT * FROM fitness_pro.trainer_details
 )
 ,login as (
 SELECT * FROM cte1
