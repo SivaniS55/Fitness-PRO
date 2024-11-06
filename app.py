@@ -54,7 +54,7 @@ from dbconfig.userend import (
 )
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.config.from_object(Config)
 
 
