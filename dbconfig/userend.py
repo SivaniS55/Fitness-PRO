@@ -23,7 +23,7 @@ def get_exercises_hel(ds_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT exercise_id, exercise_name, description, day FROM gym_train.warm_up_exercises WHERE ds_id = %s",
+        "SELECT exercise_id, exercise_name, description, day FROM fitness_pro.warm_up_exercises WHERE ds_id = %s",
         (ds_id,),
     )
     exercises = cursor.fetchall()
@@ -78,8 +78,8 @@ a.userid,
         WHEN a.userid = b.user_id THEN 1 
         ELSE NULL 
     END AS user_id
-FROM gym_train.user_details a
-JOIN gym_train.health_assessments b ON a.userid = b.user_id WHERE  a.userid = '{userid}' """
+FROM fitness_pro.user_details a
+JOIN fitness_pro.health_assessments b ON a.userid = b.user_id WHERE  a.userid = '{userid}' """
     )
     disabilities = cursor.fetchall()
     cursor.close()
@@ -92,13 +92,13 @@ def trainer_info(userid):
         """
         WITH cte1 AS (
             SELECT userid, first_name, last_name, phone_number, email, age, gender, dob, trainer_info
-            FROM gym_train.trainer_details
+            FROM fitness_pro.trainer_details
         ), cte2 AS (
             SELECT userid, first_name, last_name, phone_number, email, age, gender, dob
-            FROM gym_train.user_details
+            FROM fitness_pro.user_details
         ), cte3 AS (
             SELECT userid, trainer_id
-            FROM gym_train.subscription
+            FROM fitness_pro.subscription
         )
         SELECT b.userid AS trainer_userid, b.first_name AS trainer_first_name, b.last_name AS trainer_last_name,
                b.phone_number AS trainer_phone, b.email AS trainer_email, b.age AS trainer_age,
@@ -121,7 +121,7 @@ def fetch_exercises(ds_id):
     cursor.execute(
         """
         SELECT exercise_id, ds_id, trainer_id, exercise_name, description, day
-        FROM gym_train.warm_up_exercises
+        FROM fitness_pro.warm_up_exercises
         WHERE ds_id = %s
     """,
         (ds_id,),
@@ -150,7 +150,7 @@ def fetch_exercises_and_meals(day, userid):
     cursor.execute(
         """
         SELECT exercise_id, ds_id, trainer_id, exercise_name, description, day
-        FROM gym_train.warm_up_exercises
+        FROM fitness_pro.warm_up_exercises
         WHERE day = %s and trainer_id = %s
     """,
         (
@@ -162,7 +162,7 @@ def fetch_exercises_and_meals(day, userid):
     cursor.execute(
         """
         SELECT meal_id, day, trainer_id, meal_name, weight, time_of_day
-        FROM gym_train.meal_plans
+        FROM fitness_pro.meal_plans
         WHERE day = %s and trainer_id = %s
     """,
         (
@@ -204,8 +204,8 @@ def get_clients_with_disabilities(trainer_id):
     cursor.execute("""
         SELECT ud.userid, ud.first_name, ud.last_name, ud.phone_number, ud.email, 
                ud.age, ud.gender, ud.dob
-        FROM gym_train.user_details ud
-        JOIN gym_train.subscription s ON s.userid = ud.userid
+        FROM fitness_pro.user_details ud
+        JOIN fitness_pro.subscription s ON s.userid = ud.userid
         WHERE s.trainer_id = %s
     """, (trainer_id,))
     clients = cursor.fetchall()
@@ -228,7 +228,7 @@ def get_clients_with_disabilities(trainer_id):
         # Query for disabilities of each client
         cursor.execute("""
             SELECT ds_id, ds_name, description, days_suffering, severity
-            FROM gym_train.disability
+            FROM fitness_pro.disability
             WHERE userid = %s
         """, (client[0],))
         disabilities = cursor.fetchall()

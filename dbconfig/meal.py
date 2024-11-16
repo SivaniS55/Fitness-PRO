@@ -68,9 +68,9 @@ def get_meals(userid):
         b.first_name,
         b.last_name
     FROM 
-        gym_train.meal_plans a
+        fitness_pro.meal_plans a
     LEFT JOIN 
-        gym_train.user_details b ON a.trainer_id = b.userid where b.userid = '{userid}';"""
+        fitness_pro.user_details b ON a.trainer_id = b.userid where b.userid = '{userid}';"""
     )
     meals = cursor.fetchall()
     cursor.close()

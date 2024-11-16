@@ -24,20 +24,21 @@
                     <input type="text" class="form-control" id="description" name="description" required>
                 </div>
                 <div class="mb-3">
-                    <label for="daysSuffering" class="form-label">Days Suffering</label>
-                    <input type="date" class="form-control" id="daysSuffering" name="days_suffering" required>
+                    <label for="days_suffering" class="form-label">Days Suffering</label>
+                    <input type="date" class="form-control" id="days_suffering" name="days_suffering" required>
                 </div>
                 <div class="mb-3">
                     <label for="customRange3" class="form-label">Severity (0-5)
-                        <h4 id="rangeValue">0</h4>
+                        <h3 id="rangeValue">0</h3>
                     </label>
+                    <label for="severity">Severity Level</label>
                     <input type="range" class="form-range" min="0" max="5" step="0.5" id="severity" name="severity" required oninput="updateRangeValue(this.value)">
                 </div>
                 <button type="button" class="btn btn-primary" onclick="addDisability()">Add Disability</button>
             </form>
         </div>
         
-        <h2>Disabilities List</h2>
+        <h4>Disabilities List</h4>
         <table class="table table-striped" id="disabilitiesTable">
             <thead>
                 <tr>
@@ -116,7 +117,7 @@
         async function addDisability() {
             const name = document.getElementById('disabilityName').value;
             const description = document.getElementById('description').value;
-            const days_suffering = document.getElementById('daysSuffering').value;
+            const days_suffering = document.getElementById('days_suffering').value;
             const severity = document.getElementById('severity').value;
             try {
                 const response = await fetch('/disability/add', {
@@ -154,11 +155,11 @@
         console.error("Error deleting disability:", error);
     }
 }
-function openEditModal(id, name, description, daysSuffering, severity) {
+function openEditModal(id, name, description, days_suffering, severity) {
             document.getElementById('editDisabilityId').value = id;
             document.getElementById('editDisabilityName').value = name;
             document.getElementById('editDescription').value = description;
-            document.getElementById('editDaysSuffering').value = daysSuffering;
+            document.getElementById('editDaysSuffering').value = days_suffering;
             document.getElementById('editSeverity').value = severity;
             const editModal = new bootstrap.Modal(document.getElementById('editDisabilityModal'));
             editModal.show();

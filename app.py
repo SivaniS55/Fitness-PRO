@@ -1,4 +1,4 @@
-from Flask import (
+from flask import (
     Flask,
     render_template,
     request,
@@ -53,8 +53,11 @@ from dbconfig.userend import (
     trainer_info,
 )
 
-app = Flask(__name__)
+
+app = Flask(__name__, static_folder='static')
 app.config.from_object(Config)
+
+
 
 
 def create_userid(first_name, last_name, email, is_trainer=False):

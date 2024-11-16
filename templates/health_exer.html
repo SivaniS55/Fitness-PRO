@@ -18,7 +18,8 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <h2>Select Disability</h2>
+                <h3>Select Disability</h3>
+                <label for="disabilitySelect">Select Disability</label>
                 <select id="disabilitySelect" class="form-control mb-4" onchange="fetchExercisesForDisability()">
                     <option value="">Select a Disability</option>
                     <!-- Disabilities will be populated here -->
@@ -78,7 +79,7 @@ async function fetchExercisesForDisability() {
                     card.innerHTML = `
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">${exercise.exercise_name}</h5>
+                                <h4 class="card-title">${exercise.exercise_name}</h4>
                                 <p class="card-text">Duration: ${exercise.description}</p>
                                 <p class="card-text"><strong>Day:</strong> ${exercise.day}</p>
                                 <span style="text-decoration: none;font-size: 10px;">

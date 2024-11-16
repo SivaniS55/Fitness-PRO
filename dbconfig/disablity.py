@@ -18,7 +18,7 @@ def add_disability(userid, name, description, days_suffering, severity):
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO gym_train.disability (ds_id, userid, ds_name, description, days_suffering, severity) "
+            "INSERT INTO fitness_pro.disability (ds_id, userid, ds_name, description, days_suffering, severity) "
             "VALUES (UUID(), %s, %s, %s, %s, %s)",
             (userid, name, description, days_suffering, severity),
         )
@@ -107,7 +107,7 @@ def delete_disability(id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM gym_train.disability WHERE ds_id = %s", (id,))
+        cursor.execute("DELETE FROM fitness_pro.disability WHERE ds_id = %s", (id,))
         conn.commit()
         cursor.close()
         conn.close()
@@ -134,7 +134,7 @@ def update_disability(id, updated_data):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        sql = "UPDATE gym_train.disability SET "
+        sql = "UPDATE fitness_pro.disability SET "
         sql += ", ".join([f"{key} = %s" for key in updated_data.keys()])
         sql += " WHERE ds_id = %s"
         values = list(updated_data.values()) + [id]
